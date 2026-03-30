@@ -294,3 +294,9 @@ class RoomCard extends HTMLElement {
 }
 
 customElements.define('room-card', RoomCard);
+window.customCards = window.customCards || [];
+window.customCards.push({
+  type: "room-card",
+  name: "Room Card",
+  description: "Szoba Kártya"
+});
