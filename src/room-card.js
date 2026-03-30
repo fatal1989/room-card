@@ -1,20 +1,25 @@
 // ============================================
 // SZERKESZTŐ
 // ============================================
-class SzobaKartyaEditor extends HTMLElement {
+class RoomCardEditor extends HTMLElement {
+
+  set hass(hass) {
+    this._hass = hass;
+    // Entity picker-eknek kell a hass
+    this.querySelectorAll('ha-entity-picker').forEach(el => {
+      el.hass = hass;
+    });
+  }
 
   setConfig(config) {
-    this.config = config;
+    this.config = { ...config };
     this.render();
   }
 
-  // Ez hívódik meg amikor a felhasználó változtat valamit
   _valueChanged(key, value) {
-    const ujConfig = { ...this.config, [key]: value };
-    
-    // Ezt a HA figyeli – automatikusan frissíti az előnézetet
+    this.config = { ...this.config, [key]: value };
     this.dispatchEvent(new CustomEvent('config-changed', {
-      detail: { config: ujConfig },
+      detail: { config: this.config },
       bubbles: true,
       composed: true
     }));
@@ -68,11 +73,16 @@ class SzobaKartyaEditor extends HTMLElement {
           border: 1px solid var(--divider-color);
           flex-shrink: 0;
         }
+        ha-entity-picker,
+        ha-icon-picker,
+        ha-textfield {
+          display: block;
+          width: 100%;
+        }
       </style>
 
       <div class="szerkeszto">
 
-        <!-- ALAPADATOK -->
         <div class="mezocsoport">
           <div class="csoport-cim">Alapadatok</div>
 
@@ -90,7 +100,7 @@ class SzobaKartyaEditor extends HTMLElement {
               <label>Hőmérséklet szenzor</label>
               <ha-entity-picker
                 id="entity"
-                .hass="${this.hass}"
+                .hass="${this._hass}"
                 .value="${this.config.entity ?? ''}"
                 domain-filter="sensor"
               ></ha-entity-picker>
@@ -99,7 +109,7 @@ class SzobaKartyaEditor extends HTMLElement {
               <label>Páratartalom szenzor</label>
               <ha-entity-picker
                 id="paratartalom_entity"
-                .hass="${this.hass}"
+                .hass="${this._hass}"
                 .value="${this.config.paratartalom_entity ?? ''}"
                 domain-filter="sensor"
               ></ha-entity-picker>
@@ -107,7 +117,6 @@ class SzobaKartyaEditor extends HTMLElement {
           </div>
         </div>
 
-        <!-- MEGJELENÉS -->
         <div class="mezocsoport">
           <div class="csoport-cim">Megjelenés</div>
 
@@ -135,7 +144,7 @@ class SzobaKartyaEditor extends HTMLElement {
           </div>
 
           <div>
-            <label>GyorsSzínek</label>
+            <label>Gyorsszínek</label>
             <div style="display:flex;gap:8px;flex-wrap:wrap">
               ${[
                 { szin: '#ffa726', nev: 'Narancs' },
@@ -154,7 +163,8 @@ class SzobaKartyaEditor extends HTMLElement {
                     border-radius:8px;
                     background:${szin};
                     cursor:pointer;
-                    border: 2px solid ${this.config.szin === szin ? '#fff' : 'transparent'};
+                    border:2px solid ${this.config.szin === szin ? '#fff' : 'transparent'};
+                    transition:border-color 0.15s;
                   "
                 ></div>
               `).join('')}
@@ -165,7 +175,6 @@ class SzobaKartyaEditor extends HTMLElement {
       </div>
     `;
 
-    // Event listener-ek
     this.querySelector('#nev')
       ?.addEventListener('change', e => this._valueChanged('nev', e.target.value));
 
@@ -184,41 +193,45 @@ class SzobaKartyaEditor extends HTMLElement {
         this.querySelector('.szin-elonezet').style.background = e.target.value;
       });
 
-    // Gyorsszín kattintás
     this.querySelectorAll('.gyors-szin').forEach(el => {
       el.addEventListener('click', () => {
-        const szin = el.dataset.szin;
-        this._valueChanged('szin', szin);
-        this.config = { ...this.config, szin };
-        this.render(); // újrarajzol hogy a kijelölés frissüljön
+        this._valueChanged('szin', el.dataset.szin);
+        this.config = { ...this.config, szin: el.dataset.szin };
+        this.render();
       });
     });
   }
 }
 
-customElements.define('szoba-kartya-editor', SzobaKartyaEditor);
+customElements.define('room-card-editor', RoomCardEditor);
 
 
 // ============================================
-// MAGA A KÁRTYA
+// KÁRTYA
 // ============================================
-class SzobaKartya extends HTMLElement {
+class RoomCard extends HTMLElement {
 
   set hass(hass) {
     this._hass = hass;
-    // Az editor is megkapja a hass-t (entity picker-hez kell)
-    if (this._editor) this._editor.hass = hass;
     this.render();
   }
 
   setConfig(config) {
     if (!config.entity) throw new Error('Az entity megadása kötelező');
-    this.config = config;
+    this.config = { ...config };
   }
 
   render() {
     if (!this._hass || !this.config) return;
-    const { entity, nev, paratartalom_entity, szin = '#4fc3f7', icon = 'mdi:home' } = this.config;
+
+    const {
+      entity,
+      nev,
+      paratartalom_entity,
+      szin = '#4fc3f7',
+      icon = 'mdi:home'
+    } = this.config;
+
     const homerseklet = this._hass.states[entity]?.state ?? '–';
     const paratartalom = paratartalom_entity
       ? this._hass.states[paratartalom_entity]?.state + '% páratartalom'
@@ -233,7 +246,7 @@ class SzobaKartya extends HTMLElement {
             </div>
             <div>
               <div class="szoba-nev">${nev ?? entity}</div>
-              <div class="al-szoveg">${paratartalom}</div>
+              ${paratartalom ? `<div class="al-szoveg">${paratartalom}</div>` : ''}
             </div>
           </div>
           <div class="homerseklet" style="color:${szin}">
@@ -254,7 +267,7 @@ class SzobaKartya extends HTMLElement {
           padding: 14px 16px;
         }
         .bal-oldal { display:flex;align-items:center;gap:10px; }
-        .ikon-hatter { border-radius:10px;padding:8px;display:flex; }
+        .ikon-hatter { border-radius:10px;padding:8px;display:flex;align-items:center; }
         ha-icon { --mdc-icon-size:20px; }
         .szoba-nev { font-size:13px;font-weight:500;color:#e8e9ea; }
         .al-szoveg { font-size:11px;color:#8a8d91;margin-top:2px; }
@@ -264,11 +277,8 @@ class SzobaKartya extends HTMLElement {
     `;
   }
 
-  // Visszaadja a szerkesztő elemet
   static getConfigElement() {
-    const editor = document.createElement('szoba-kartya-editor');
-    this._editor = editor;
-    return editor;
+    return document.createElement('room-card-editor');
   }
 
   static getStubConfig() {
@@ -283,4 +293,4 @@ class SzobaKartya extends HTMLElement {
   getCardSize() { return 1; }
 }
 
-customElements.define('szoba-kartya', SzobaKartya);
+customElements.define('room-card', RoomCard);
