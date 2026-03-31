@@ -1,4 +1,4 @@
-#Room Card for Home Assistant
+# Room Card for Home Assistant
 Egy modern, letisztult és nagymértékben testreszabható egyedi kártya (custom card) Home Assistanthez, amellyel egy adott szoba legfontosabb klíma- és környezeti adatait jelenítheted meg.
 
 A kártya saját, beépített grafikus szerkesztővel (Visual Editor) rendelkezik, így YAML kódolás nélkül is könnyedén beállítható!
