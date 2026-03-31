@@ -19,23 +19,7 @@ Többnyelvűség (i18n): Külön fájlban (translations.js) kezelt nyelvi fájlo
 
 Teljes testreszabhatóság: Állítható betűszínek, háttérszínek (vagy téma alapértelmezett), saroklekerekítés, betű- és ikonméretek.
 
-📥 Telepítés
-Mivel a kártya moduláris felépítésű (a nyelvi fájlokat külön kezeli), nagyon fontos, hogy JavaScript Module-ként (ES6) regisztráld a Home Assistantben!
 
-Manuális telepítés
-Töltsd le a room-card.js és a translations.js fájlokat.
-
-Másold be mindkét fájlt a Home Assistant config/www/room-card/ mappájába (ha a mappa nem létezik, hozd létre).
-
-Lépj be a Home Assistant felületén a Beállítások -> Irányítópultok (Dashboards) -> jobb felül a három pontra kattintva Erőforrások (Resources) menüpontba.
-
-Kattints az Erőforrás hozzáadása gombra:
-
-URL: /local/room-card/room-card.js
-
-Erőforrás típusa: JavaScript Module (type: module)
-
-Frissítsd a böngésződet (F5 vagy Ctrl+R), vagy ürítsd a gyorsítótárat.
 
 🛠️ Használat
 A telepítés után navigálj az egyik Irányítópultodra (Dashboard), kattints a szerkesztésre, majd a kártya hozzáadására. Keresd meg a listában a "Room Card"-ot.
