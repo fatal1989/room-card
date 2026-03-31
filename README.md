@@ -1,4 +1,6 @@
 # Room Card for Home Assistant
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=fatal1989&repository=room-card&category=plugin)
 Egy modern, letisztult és nagymértékben testreszabható egyedi kártya (custom card) Home Assistanthez, amellyel egy adott szoba legfontosabb klíma- és környezeti adatait jelenítheted meg.
 
 A kártya saját, beépített grafikus szerkesztővel (Visual Editor) rendelkezik, így YAML kódolás nélkül is könnyedén beállítható!
