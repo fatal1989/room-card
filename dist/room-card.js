@@ -294,10 +294,12 @@ class RoomCard extends HTMLElement {
 }
 
 customElements.define('room-card', RoomCard);
+customElements.define('room-card-editor', RoomCardEditor);
+
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: "custom:room-card",
+  type: "room-card",
   name: "Room Card",
-  description: "Szoba Kártya",
-  preview: true
+  preview: false,
+  description: "Szobahőmérséklet és páratartalom kártya",
 });
